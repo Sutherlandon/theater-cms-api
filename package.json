@@ -1,0 +1,16 @@
+{
+  "name": "theater-cms-api",
+  "version": "1.0.0",
+  "description": "The back end API for the Theater CMS project",
+  "main": "index.js",
+  "repository": "git@github.com:Sutherlandon/theater-cms-api.git",
+  "author": "Sutherland, Landon Dexter <sutherlandon@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "hapi": "^18.1.0",
+    "hapi-auth-jwt2": "^8.6.1",
+    "loki": "^0.17.0",
+    "lokijs": "^1.5.6"
+  }
+}
