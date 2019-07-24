@@ -5,10 +5,18 @@
 
 // import required packages
 const Hapi = require('hapi');
+const mongoose = require('mongoose');
 
 //const imdb = require('imdb-api');
 const config = require('./config.js');
 const db = require('./utils/database');
+
+mongoose.connect('mongodb://localhost/theater-cms-dev', {
+  useNewUrlParser: true,
+});
+
+const mongodb = mongoose.connection;
+mongodb.once('open', () => console.log('Connected to the database'));
 
 // bring your own validation function?
 const validate = async (decoded, request) => {
