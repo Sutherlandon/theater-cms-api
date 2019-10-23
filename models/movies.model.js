@@ -27,9 +27,7 @@ const MovieSchema = mongoose.Schema({
   showtimes: Object,
 });
 
-const Movie = mongoose.model('Movie', MovieSchema);
-
-Movie.methods = {
+MovieSchema.statics = {
   get(name) {
     if (name) {
       return this.find({ name })
@@ -37,12 +35,18 @@ Movie.methods = {
         .exec();
     }
 
-    return this.find().lean().exec();
+    return this.find()
+      .lean()
+      .exec();
   },
 
   add(movie) {
-    return this.save(movie, { new: true }).exec()
+    return this.save(movie, { new: true })
+      .exec()
+      .then(() => this.get());
   }
 };
+
+const Movie = mongoose.model('Movie', MovieSchema);
 
 module.exports = Movie;

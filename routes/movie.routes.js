@@ -1,30 +1,31 @@
-//const Movies = require('../models/movies.model');
 const Movie = require('../models/movies.model');
-//const db = require('../utils/database');
+const router = require('express').Router();
 
-const movieRoutes = [{
-  method: 'GET',
-  path: '/api/movies',
-  config: {
-    auth: false,
-  },
-  handler: async (request, h) => {
-    //console.log(request);
-    const name = request.body ? request.body.name : false;
-    const result = await Movie.find().lean();
-    return h.response(result);
-  }
-}, {
-  method: 'POST',
-  path: '/api/movies',
-  config: {
-    auth: false,
-  },
-  handler: async (request, h) => {
-    //console.log(request);
-    const result = await Movie.add(request.body);
-    return h.response(result);
-  }
-}];
+router.route('/api/movies')
+  .get(async (req, res, next) => {
+    const query = {};
+    if (req.body && req.body.name) {
+      query.name = req.body.name;
+    }
+    
+    try {
+      const result = await Movie.find(query).lean();
+      return res.json(result);
+    } catch (err) {
+      console.log(err);
+      next(err)
+    }
+  })
+  .post(async (req, res, next) => {
+    try {
+      const movie = new Movie(req.body);
+      await movie.save();
+      const result = await Movie.find({ title: req.body.title }).lean();
+      return res.json(result);
+    } catch (err) {
+      console.log(err);
+      next(err)
+    }
+  });
 
-module.exports = movieRoutes;
+module.exports = router;

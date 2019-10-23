@@ -4,99 +4,32 @@
  */
 
 // import required packages
-const Hapi = require('hapi');
-const mongoose = require('mongoose');
+const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
 
 //const imdb = require('imdb-api');
-const config = require('./config.js');
-const db = require('./utils/database');
+const config = require('./config/config.js');
 
-mongoose.connect('mongodb://localhost/theater-cms-dev', {
-  useNewUrlParser: true,
+// connect to the database
+require('./config/database.js');
+
+// build an api with express
+const app = express();
+
+// overhead middleware
+app.use(helmet());
+app.use(cors({ /* TODO: Lock down by origin */ }));
+app.use(express.json());
+
+// register routes
+app.use(require('./routes/user.routes'));
+app.use(require('./routes/movie.routes'));
+
+// fires up the server to listen on port 3001
+app.listen(config.api_port, function () {
+  console.log(`Theater-CMS running (port: ${config.api_port})`);
 });
-
-const mongodb = mongoose.connection;
-mongodb.once('open', () => console.log('Connected to the database'));
-
-// bring your own validation function?
-const validate = async (decoded, request) => {
-  let isValid = true;
-
-  // do your checks here
-
-  return { isValid };
-}
-
-// initialize the server
-const init = async () => {
-  // load the database, if it's the first time load it with test data
-  try {
-    await db.loadDatabase({});
-
-    // load test data
-    let Movies = db.getCollection('movies');
-    if (Movies === null) {
-      console.log('loading test movies...');
-      Movies = db.addCollection('movies');
-      require('./test_data.js').movies.forEach(movie => Movies.insert(movie)); 
-    }
-
-    let Users = db.getCollection('users');
-    if (Users === null) {
-      console.log('loading test users...');
-      Users = db.addCollection('users');
-      [{
-        username: 'landon',
-        password: 'hello'
-      }, {
-        username: 'liese',
-        password: 'world'
-      }]
-        .forEach(user => Users.insert(user));
-    }
-
-    console.log('initialized DB');
-  } catch(err) {
-    console.log(`Error: ${err}`)
-  }
-
-  // build an api with hapi
-  const server = Hapi.server({
-    host: config.hostname,
-    port: config.api_port,
-    routes: {
-      cors: true
-    }
-  });
-
-  // register the auth plugin and wrap the user routes with them
-  await server.register(require('hapi-auth-jwt2'));
-
-  // give the stategy both name and scheme of 'jwt'
-  server.auth.strategy('jwt', 'jwt', {
-    key: config.secret,
-    validate: validate,
-    verifyOptions: { algorithms: ['HS256'] },
-  });
-
-  server.auth.default('jwt');
-
-  // register routes
-  server.route(require('./routes/user.routes'));
-  server.route(require('./routes/movie.routes'));
-
-  await server.start((err) => {
-    if (err) {
-      throw err;
-    }
-  });
-
-  console.log(`Server running at: ${server.info.uri}`);
-}
-
-// fire it up!
-init().catch(err => console.log(err));
-
 
 
 /** Beneath here is irrelevent now I think */
@@ -127,8 +60,4 @@ app.get('/movie/:title/:year', function (req, res) {
   });
 });
 
-// fires up the server to listen on port 3001
-app.listen(env.api_port, function () {
-  console.log(`Theater-CMS running (port: ${env.api_port})`);
-});
 */
