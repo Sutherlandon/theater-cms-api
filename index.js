@@ -25,6 +25,9 @@ app.use(express.json());
 // register routes
 app.use(require('./routes/user.routes'));
 app.use(require('./routes/movie.routes'));
+app.use(require('./routes/upload.routes'));
+
+app.use('/api/uploads', express.static('uploads'));
 
 // fires up the server to listen on port 3001
 app.listen(config.api_port, function () {
