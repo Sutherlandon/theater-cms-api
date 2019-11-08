@@ -25,6 +25,8 @@ const MovieSchema = mongoose.Schema({
   rating: String,
   runtime: String,
   showtimes: Object,
+  start_date: Date,
+  end_date: Date,
 });
 
 MovieSchema.statics = {

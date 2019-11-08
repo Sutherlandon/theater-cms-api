@@ -1,8 +1,17 @@
 const router = require('express').Router();
-const fs = require('fs');
 const multer = require('multer');
 
-const upload = multer({ dest: 'uploads/' });
+// Build the file uploader
+const upload = multer({ 
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+      cb(null, file.originalname);
+    }
+  }),
+});
 
 router.route('/api/uploads')
   //.get(express.static(path.join(__dirname, '../uploads')))

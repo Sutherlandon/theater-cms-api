@@ -1,8 +1,5 @@
-const Movie = require('../models/movies.model');
 const router = require('express').Router();
-const multer = require('multer');
-
-const upload = multer({ dest: '../uploads' });
+const Movie = require('../models/movies.model');
 
 router.route('/api/movies')
   .get(async (req, res, next) => {
@@ -20,12 +17,7 @@ router.route('/api/movies')
     }
   })
   .post(
-    upload.single('poster'),
     async (req, res, next) => {
-      console.log(req.file, req.body );
-
-      //TODO save the file
-
       try {
         const movie = new Movie(req.body);
         await movie.save();
@@ -33,9 +25,21 @@ router.route('/api/movies')
         return res.json(result);
       } catch (err) {
         console.log(err);
-        next(err)
+        return next(err)
       }
     }
+  )
+  .put(
+    async (req, res, next) => {
+      try {
+        const movie = await Movie.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true });
+        return res.json(movie);
+      } catch (err) {
+        console.log(err);
+        return next(err)
+      }
+    }
+
   );
 
 module.exports = router;
