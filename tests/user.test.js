@@ -37,5 +37,17 @@ describe('User Tests', () => {
 
       expect(res.status).toEqual(200);
     });
+
+    it('Should get a list of users', async () => {
+      const res = await request.get('/api/users')
+
+      expect(res.body).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          _id: expect.any(String),
+          username: expect.any(String),
+          roles: expect.arrayContaining([expect.any(String)]),
+        })
+      ]));
+    });
   })
 })

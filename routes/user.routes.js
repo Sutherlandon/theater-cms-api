@@ -20,8 +20,9 @@ const hashPassword = (password) => new Promise((resolve) => {
 
 router.route('/')
   .get(async (req, res) => {
-    const users = User.find();
-    console.log(users);
+    const users = (await User.find())
+      .map(({ _id, username, roles }) => ({ _id, username, roles }));
+
     return res.json(users);
   })
   .post(async (req, res, next) => {
@@ -30,7 +31,7 @@ router.route('/')
     // hash the password, and insert, and return a json token
     try {
       const { hash, salt } = await hashPassword(password);
-      const user = await User.create({
+      await User.create({
         username,
         password: hash,
         roles: ['user'],
