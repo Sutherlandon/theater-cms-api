@@ -3,25 +3,28 @@
  * This is the backend API for controlling movie data
  */
 
-const config = require('./config/config.js');
-const TheaterCMS = require('./config/express.js');
+// import required packages
+const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
+//const imdb = require('imdb-api');
 
-async function init() {
-  try {
-    const app = await TheaterCMS();
+// connect to the database
+require('./database.js');
 
-    // fires up the server to listen on port 3001
-    if (process.env.NODE_ENV !== 'test') {
-      app.listen(config.api_port, function () {
-        console.log(`Theater-CMS running (port: ${config.api_port})`);
-      });
-    }
-  } catch(err) {
-    console.log(err);
-  }
-}
+// build an api with express
+const app = express();
 
-init();
+// overhead middleware
+app.use(helmet());
+app.use(cors({ /* TODO: Lock down by origin */ }));
+app.use(express.json());
+
+// register routes
+app.use('/api/public', express.static('public'));
+app.use('/api', require('../routes/index.routes'));
+
+module.exports = app;
 
 /** Beneath here is irrelevent now I think */
 

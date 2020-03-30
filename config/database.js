@@ -1,11 +1,17 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/theater-cms-dev', {
+let db = 'theater-cms-dev';
+if (process.env.NODE_ENV === 'test') {
+  db = 'theater-cms-test';
+}
+
+mongoose.connect(`mongodb://localhost/${db}`, {
   useNewUrlParser: true,
 });
 
 const mongodb = mongoose.connection;
-mongodb.once('open', () => console.log('Connected to the mongo:theater-cms-dev'));
+
+mongodb.once('open', () => console.log(`Connected to the mongo:${db}`));
 
 // // load the database, if it's the first time load it with test data
 // try {

@@ -1,5 +1,8 @@
-const Users = require('../models/user.model');
-const router = require('express').Router();
+const express = require('express');
+const bcrypt = require('bcrypt');
+const User = require('../models/user.model');
+
+const router = express.Router();
 
 /**
  * Generate a hashed password
@@ -10,60 +13,36 @@ const hashPassword = (password) => new Promise((resolve) => {
   // Generate a salt at level 10 strength
   bcrypt.genSalt(10, (err, salt) => {
     bcrypt.hash(password, salt, (err, hash) => {
-      return resolve(hash);
+      return resolve({ hash, salt });
     });
   });
 });
 
-router.route('api/users')
+router.route('/')
   .get(async (req, res) => {
-    return res.json(await Users.find());
+    const users = User.find();
+    console.log(users);
+    return res.json(users);
   })
-  .post(async (req, res) => {
+  .post(async (req, res, next) => {
     const { username, password } = req.body;
-    const user = { username, password };
 
-    // valiate the user, hash the password, and insert, and return a json token
+    // hash the password, and insert, and return a json token
     try {
-      await Users.validate(user)
-      user.passord = await hashPassword(passowrd);
-      return res.json(await Users.insert(user));
+      const { hash, salt } = await hashPassword(password);
+      const user = await User.create({
+        username,
+        password: hash,
+        roles: ['user'],
+        salt,
+      });
+
+      return res.send('OK');
+
      } catch (err) {
-       throw Boom.badRequest(err)
+       console.log(err);
+       return next(err);
      };
   });
-
-// const userRoutes = [{
-//   method: 'GET',
-//   path: '/api/users',
-//   config: {
-//     auth: false,
-//   },
-//   handler: (request, h) => {
-//     return h.response(Users.find()); //.header('Authorization', request.headers.authorization)
-//   }
-// }, {
-//   method: 'POST',
-//   path: '/api/users',
-//   config: {
-//     auth: 'jwt',
-//   },
-//   handler: (request, h) => {
-//     const { username, password } = req.payload;
-//     const user = { username, password };
-
-//     // valiate the user, hash the password, and insert, and return a json token
-//     return Users.validate(user)
-//       .then(hashPassword(password))
-//       .then((hash) => {
-//         user.password = hash;
-//         return Users.insert(user)
-//       })
-//       .then(() => h({ id_token: createToken(user) }).code(201))
-//       .catch((err) => {
-//         throw Boom.badRequest(err)
-//       });
-//   }
-// }];
 
 module.exports = router;

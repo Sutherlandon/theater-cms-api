@@ -8,6 +8,7 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
+    "bcrypt": "^4.0.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-jwt": "^5.3.1",
@@ -20,10 +21,11 @@
     "multer": "^1.4.2"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "nodemon index.js",
+    "test": "jest"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
-    "mocha": "^6.2.1"
+    "jest": "^25.2.4",
+    "supertest": "^4.0.2"
   }
 }
