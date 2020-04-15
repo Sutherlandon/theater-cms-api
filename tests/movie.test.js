@@ -41,9 +41,11 @@ describe('Movie Tests', () => {
   });
 
   describe('POST /api/movies', () => {
-
     it('Should create a new movie and return the new record', async () => {
-      const { body: received } = await request.post('/api/movies').send(testData);
+      const { body: received } = await request
+        .post('/api/movies')
+        .send(testData);
+
       const expected = {
         ...testData,
         _id: expect.any(String),
@@ -56,8 +58,8 @@ describe('Movie Tests', () => {
     });
 
     it('Should return a list of movies now that there is one', async () => {
-      const res = await request.get('/api/movies')
-      expect(res.body).toEqual([testData]);
+      const { body: received } = await request.get('/api/movies')
+      expect(received).toEqual([testData]);
     });
   });
 
@@ -69,8 +71,11 @@ describe('Movie Tests', () => {
         rating: 'R',
       };
 
-      const res = await request.put('/api/movies').send(formData);
-      expect(res.body).toMatchObject(formData)
+      const { body: received } = await request
+        .put('/api/movies')
+        .send(formData);
+
+      expect(received).toMatchObject(formData)
     });
   });
 });
