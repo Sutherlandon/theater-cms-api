@@ -7,7 +7,6 @@ const User = require('../models/user.model');
 const request = supertest(app);
 
 describe('User Tests', () => {
-
   beforeAll( async () => {
     try {
       // clear out the user table to start fresh
@@ -15,7 +14,7 @@ describe('User Tests', () => {
     } catch (err) {
       console.log(err);
     }
-  })
+  });
 
   describe('GET /api/health-check', () => {
     it('Should return 200 OK', async () => {
@@ -23,31 +22,31 @@ describe('User Tests', () => {
 
       expect(res.status).toEqual(200);
     });
-  })
+  });
 
   describe('POST /api/users', () => {
     it('Should create a new user and return 200 OK', async () => {
       let newUser = {
-        username: 'Landon',
+        username: 'Test User',
         password: 'TooC00l4Skool',
       };
       
-      const res = await request.post('/api/users')
-        .send(newUser);
+      const { status } = await request.post('/api/users').send(newUser);
 
-      expect(res.status).toEqual(200);
+      expect(status).toEqual(200);
     });
 
     it('Should get a list of users', async () => {
-      const res = await request.get('/api/users')
-
-      expect(res.body).toEqual(expect.arrayContaining([
+      const { body: received } = await request.get('/api/users')
+      const expected = expect.arrayContaining([
         expect.objectContaining({
           _id: expect.any(String),
           username: expect.any(String),
           roles: expect.arrayContaining([expect.any(String)]),
         })
-      ]));
+      ])
+
+      expect(received).toEqual(expected);
     });
-  })
-})
+  });
+});

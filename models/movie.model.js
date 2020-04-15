@@ -27,12 +27,14 @@ const MovieSchema = mongoose.Schema({
   showtimes: Object,
   start_date: Date,
   end_date: Date,
+}, {
+  collection: 'movies',
 });
 
 MovieSchema.statics = {
-  get(name) {
-    if (name) {
-      return this.find({ name })
+  get(title) {
+    if (title) {
+      return this.find({ title })
         .lean()
         .exec();
     }
@@ -41,12 +43,6 @@ MovieSchema.statics = {
       .lean()
       .exec();
   },
-
-  add(movie) {
-    return this.save(movie, { new: true })
-      .exec()
-      .then(() => this.get());
-  }
 };
 
 const Movie = mongoose.model('Movie', MovieSchema);
