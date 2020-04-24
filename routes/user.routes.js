@@ -1,22 +1,7 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
 const User = require('../models/user.model');
 
 const router = express.Router();
-
-/**
- * Generate a hashed password
- * @param {String} password
- * @param {Function} callback
- */
-const hashPassword = (password) => new Promise((resolve) => {
-  // Generate a salt at level 10 strength
-  bcrypt.genSalt(10, (err, salt) => {
-    bcrypt.hash(password, salt, (err, hash) => {
-      return resolve({ hash, salt });
-    });
-  });
-});
 
 router.route('/')
   .get(async (req, res) => {
@@ -30,7 +15,7 @@ router.route('/')
 
     // hash the password, and insert, and return a json token
     try {
-      const { hash, salt } = await hashPassword(password);
+      const { hash, salt } = await User.generateHash(password);
       await User.create({
         username,
         password: hash,
@@ -38,10 +23,9 @@ router.route('/')
         salt,
       });
 
-      return res.send('OK');
+      return res.status(200).send();
 
      } catch (err) {
-       console.log(err);
        return next(err);
      };
   });

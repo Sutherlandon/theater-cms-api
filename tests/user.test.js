@@ -5,6 +5,10 @@ const User = require('../models/user.model');
 
 // init the app
 const request = supertest(app);
+let newUser = {
+  username: 'Test User',
+  password: 'TooC00l4Skool',
+};
 
 describe('User Tests', () => {
   beforeAll( async () => {
@@ -18,21 +22,14 @@ describe('User Tests', () => {
 
   describe('GET /api/health-check', () => {
     it('Should return 200 OK', async () => {
-      const res = await request.get('/api/health-check')
-
-      expect(res.status).toEqual(200);
+      const { status } = await request.get('/api/health-check')
+      expect(status).toEqual(200);
     });
   });
 
   describe('POST /api/users', () => {
     it('Should create a new user and return 200 OK', async () => {
-      let newUser = {
-        username: 'Test User',
-        password: 'TooC00l4Skool',
-      };
-      
       const { status } = await request.post('/api/users').send(newUser);
-
       expect(status).toEqual(200);
     });
 
@@ -47,6 +44,21 @@ describe('User Tests', () => {
       ])
 
       expect(received).toEqual(expected);
+    });
+  });
+});
+
+describe('Auth Tests', () => {
+  describe('POST /api/auth/login', () => {
+    it('Should log in a user and send back a send back a JWT', async () => {
+      const res = await request.post('/api/auth/login').send(newUser);
+      expect(res.status).toEqual(200);
+      expect(res.header.authtoken).not.toBeUndefined();
+    });
+
+    it('Should send a 401 when the credentials do not match', async () => {
+      const res = await request.post('/api/auth/login').send({ username: 'landoman', password: 'not right' });
+      expect(res.status).toEqual(401);
     });
   });
 });

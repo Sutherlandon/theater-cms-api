@@ -61,6 +61,11 @@ describe('Movie Tests', () => {
       const { body: received } = await request.get('/api/movies')
       expect(received).toEqual([testData]);
     });
+
+    it('Should return the single movie specified', async () => {
+      const { body: received } = await request.get('/api/movies').send({ title: testData.title})
+      expect(received).toMatchObject(testData);
+    });
   });
 
   describe('PUT /api/movies', () => {
