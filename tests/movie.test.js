@@ -117,5 +117,15 @@ describe('Movie Tests', () => {
         expect(exists).toBeFalsy();
       })
     })
-  })
+
+    it('Should recieve a 400 for movie not found', async () => {
+      const title = 'Bogus, The Movie';
+      const res = await request
+        .delete('/api/movies')
+        .send({ title });
+
+      expect(res.status).toEqual(400);
+      expect(res.text).toEqual(`Movie '${title}' not found`);
+    });
+  });
 });
