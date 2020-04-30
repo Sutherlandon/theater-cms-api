@@ -23,4 +23,9 @@ app.use(express.json());
 app.use('/api/public', express.static('public'));
 app.use('/api', require('../routes/index.routes'));
 
+app.use((err, req, res, next) => {
+  console.error(err);
+  next(err);
+});
+
 module.exports = app;

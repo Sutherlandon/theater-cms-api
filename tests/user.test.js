@@ -56,8 +56,13 @@ describe('Auth Tests', () => {
       expect(res.header.authtoken).not.toBeUndefined();
     });
 
-    it('Should send a 401 when the credentials do not match', async () => {
+    it('Should send a 401 when the password does not match', async () => {
       const res = await request.post('/api/auth/login').send({ username: 'landoman', password: 'not right' });
+      expect(res.status).toEqual(401);
+    });
+    
+    it('Should send a 401 when the user is not found', async () => {
+      const res = await request.post('/api/auth/login').send({ username: 'nobody', password: 'not right' });
       expect(res.status).toEqual(401);
     });
   });

@@ -13,11 +13,14 @@ const MovieSchema = mongoose.Schema({
 });
 
 MovieSchema.statics = {
-  get(title) {
+  async get(title) {
     if (title) {
-      return this.find({ title })
-        .lean()
-        .exec();
+      const movie = await this.find({ title }).lean().exec();
+      if (movie[0]) {
+        return movie[0];
+      } else {
+        return null;
+      }
     }
 
     return this.find()

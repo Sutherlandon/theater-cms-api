@@ -1,4 +1,5 @@
 /* global describe, it, expect */
+const fs = require('fs');
 const supertest = require('supertest');
 const app = require('../config/express');
 const Movie = require('../models/movie.model');
@@ -7,7 +8,6 @@ const request = supertest(app);
 describe('Movie Tests', () => {
   let testData = {
     end_date: '2020-02-08T07:00:00.000Z',
-    poster: 'testMovie.jpg',
     rating: 'G',
     runtime: '2h 35m',
     showtimes: [[
@@ -33,6 +33,13 @@ describe('Movie Tests', () => {
     }
   });
 
+  afterAll(() => {
+    // clean up the test poster file
+    fs.unlinkSync('./public/test_poster.jpg', (err) => {
+      console.error(err);
+    });
+  });
+
   describe('GET /api/movies', () => {
     it('Should return 204 `No Content` if no movies are in the database', async () => {
       const res = await request.get('/api/movies')
@@ -42,16 +49,22 @@ describe('Movie Tests', () => {
 
   describe('POST /api/movies', () => {
     it('Should create a new movie and return the new record', async () => {
-      const { body: received } = await request
+      const res = await request
         .post('/api/movies')
-        .send(testData);
+        .attach('poster', './tests/test_data/test_poster.jpg')
+        .field('metaData', JSON.stringify(testData));
 
+      const received = res.body;
       const expected = {
         ...testData,
+        poster: 'test_poster.jpg',
         _id: expect.any(String),
       };
 
       expect(received).toMatchObject(expected);
+      fs.exists('./public/test_poster.jpg', (exists) => {
+        expect(exists).toBeTruthy();
+      })
 
       // set up for the next test
       testData = received
@@ -81,6 +94,28 @@ describe('Movie Tests', () => {
         .send(formData);
 
       expect(received).toMatchObject(formData)
+
+      // set up for the next test
+      testData = received
     });
   });
+
+  describe('DELETE /api/movies', () => {
+    it('Should delete the specified movie and poster file', async () => {
+      const res = await request
+        .delete('/api/movies')
+        .send({ title: testData.title })
+
+      expect(res.status).toEqual(200);
+
+      // make sure it's gone from the DB
+      const movie = await Movie.get(testData.title);
+      expect(movie).toBeNull();
+
+      // make sure it took the file with it.
+      fs.exists('./public/test_poster.jpg', (exists) => {
+        expect(exists).toBeFalsy();
+      })
+    })
+  })
 });
