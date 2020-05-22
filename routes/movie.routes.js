@@ -61,6 +61,7 @@ router.route('/')
   )
 
   .put(async (req, res, next) => {
+    console.log('updated info', req.body);
     try {
       const movie = await Movie.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true });
       return res.json(movie);
