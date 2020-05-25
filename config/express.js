@@ -23,6 +23,10 @@ app.use(express.json());
 app.use('/api/public', express.static('public'));
 app.use('/api', require('../routes/index.routes'));
 
+app.use((req, res, next) => {
+  console.log(req.baseUrl, res.status);
+});
+
 app.use((err, req, res, next) => {
   console.error(err);
   next(err);

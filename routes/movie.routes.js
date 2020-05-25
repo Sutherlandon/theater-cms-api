@@ -60,15 +60,25 @@ router.route('/')
     }
   )
 
-  .put(async (req, res, next) => {
-    console.log('updated info', req.body);
-    try {
-      const movie = await Movie.findOneAndUpdate({ _id: req.body._id }, req.body, { new: true });
-      return res.json(movie);
-    } catch (err) {
-      return next(err)
+  .put(
+    // handle the file upload, name is req.file
+    upload.single('poster'),
+    async (req, res, next) => {
+      const data = JSON.parse(req.body.metaData);
+
+      // update the new poster file name if one was sent.
+      if (req.file) {
+        data.poster = req.file.originalname;
+      }
+
+      try {
+        const movie = await Movie.findOneAndUpdate({ _id: data._id }, data, { new: true });
+        return res.json(movie);
+      } catch (err) {
+        return next(err)
+      }
     }
-  })
+  )
 
   .delete(async (req, res, next) => {
     const { title } = req.body

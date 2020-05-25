@@ -91,9 +91,15 @@ describe('Movie Tests', () => {
 
       const { body: received } = await request
         .put('/api/movies')
-        .send(formData);
+        .attach('poster', './tests/test_data/test_poster_2.jpg')
+        .field('metaData', JSON.stringify(formData));
 
-      expect(received).toMatchObject(formData)
+      const expected = {
+        ...formData,
+        poster: 'test_poster_2.jpg',
+      }
+
+      expect(received).toMatchObject(expected)
 
       // set up for the next test
       testData = received
@@ -113,7 +119,7 @@ describe('Movie Tests', () => {
       expect(movie).toBeNull();
 
       // make sure it took the file with it.
-      fs.exists('./public/test_poster.jpg', (exists) => {
+      fs.exists('./public/test_poster_2.jpg', (exists) => {
         expect(exists).toBeFalsy();
       })
     })
